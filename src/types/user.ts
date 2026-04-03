@@ -1,4 +1,4 @@
-export type PlanTier = "free" | "starter" | "pro" | "teams";
+export type PlanTier = "free" | "starter" | "pro" | "teams" | "enterprise";
 
 export interface User {
   id: string;

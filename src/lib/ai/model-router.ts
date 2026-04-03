@@ -1,18 +1,20 @@
 import type { PlanTier } from "@/types/user";
 
-export type SalTier = "mini" | "pro" | "max";
+export type SalTier = "mini" | "pro" | "max" | "max-fast";
 
 const MODEL_MAP: Record<SalTier, string> = {
   mini: "claude-haiku-4-5-20251001",
   pro: "claude-sonnet-4-6",
   max: "claude-opus-4-6",
+  "max-fast": "claude-opus-4-6",
 };
 
 const TIER_TO_SAL: Record<PlanTier, SalTier> = {
   free: "mini",
   starter: "pro",
-  pro: "pro",
-  teams: "max",
+  pro: "max",
+  teams: "max-fast",
+  enterprise: "max-fast",
 };
 
 export function getModelForTier(planTier: PlanTier): string {
@@ -33,6 +35,7 @@ export function getSalTierLabel(salTier: SalTier): string {
     mini: "SAL Mini",
     pro: "SAL Pro",
     max: "SAL Max",
+    "max-fast": "SAL Max Pro",
   };
   return labels[salTier];
 }
