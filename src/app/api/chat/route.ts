@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { streamChat } from "@/lib/ai/claude";
 import { getModelForTier } from "@/lib/ai/model-router";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/ai/prompts";
@@ -6,10 +7,16 @@ import type { PlanTier } from "@/types/user";
 
 export const runtime = "nodejs";
 
+// Service-role client for reading profile tier
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message, history = [], planTier = "pro" } = body as {
+    const { message, history = [], planTier: clientTier } = body as {
       message: string;
       history?: { role: "user" | "assistant"; content: string }[];
       planTier?: PlanTier;
@@ -27,6 +34,28 @@ export async function POST(request: NextRequest) {
         { error: "ANTHROPIC_API_KEY is not configured" },
         { status: 500 }
       );
+    }
+
+    // Try to get real tier from Supabase (via auth token in request)
+    let planTier: PlanTier = clientTier || "free";
+    try {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+        if (user) {
+          const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("tier")
+            .eq("id", user.id)
+            .single();
+          if (profile?.tier) {
+            planTier = profile.tier as PlanTier;
+          }
+        }
+      }
+    } catch {
+      // Fall back to client-provided tier or free
     }
 
     const model = getModelForTier(planTier);

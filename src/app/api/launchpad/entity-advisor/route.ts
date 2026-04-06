@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { withGHLAgent, type GHLAgentRequest } from "@/lib/ghl/agent-middleware";
+import { withGHLAgent, OPTIONS, type GHLAgentRequest } from "@/lib/ghl/agent-middleware";
 import { generateCompletion } from "@/lib/ai/claude";
 import { ENTITY_ADVISOR_PROMPT } from "@/lib/ai/agent-prompts";
 
@@ -27,3 +27,5 @@ export async function POST(request: NextRequest) {
     return response;
   });
 }
+
+export { OPTIONS };

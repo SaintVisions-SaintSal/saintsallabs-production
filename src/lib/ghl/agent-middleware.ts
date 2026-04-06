@@ -185,3 +185,18 @@ export async function withGHLAgent(
     return formatGHLError(msg);
   }
 }
+
+/**
+ * Standard OPTIONS response for CORS preflight
+ * Add this to every GHL agent route: export { OPTIONS } from "@/lib/ghl/agent-middleware";
+ */
+export function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, x-sal-key, Authorization",
+    },
+  });
+}
