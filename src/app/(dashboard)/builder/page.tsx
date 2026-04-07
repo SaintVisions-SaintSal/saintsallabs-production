@@ -5,6 +5,7 @@ import { ChatPanel } from "@/components/builder/chat-panel";
 import { CodeEditor } from "@/components/builder/code-editor";
 import { PreviewPanel } from "@/components/builder/preview-panel";
 import { DeployBar } from "@/components/builder/deploy-bar";
+import { ProjectsPanel } from "@/components/builder/projects-panel";
 import type { ChatMessage, ProjectFile } from "@/types/project";
 import type { BuildStatus } from "@/types/builder";
 import { generateId } from "@/lib/utils";
@@ -14,6 +15,8 @@ export default function BuilderPage() {
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [currentTitle, setCurrentTitle] = useState<string>("New Project");
+  const [showProjects, setShowProjects] = useState(false);
   const [buildStatus, setBuildStatus] = useState<BuildStatus>({
     phase: "idle",
     message: "Ready",
@@ -131,34 +134,72 @@ export default function BuilderPage() {
     URL.revokeObjectURL(url);
   }, [files]);
 
+  const handleLoadProject = useCallback(
+    (loadedFiles: ProjectFile[], title: string) => {
+      setFiles(loadedFiles);
+      setCurrentTitle(title);
+      setMessages([]);
+      setSelectedPath(loadedFiles.length > 0 ? loadedFiles[0].path : null);
+      setBuildStatus({ phase: "idle", message: "Project loaded" });
+      setShowProjects(false);
+    },
+    []
+  );
+
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)] lg:h-[calc(100vh-5.5rem)]">
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Chat Panel */}
-        <div className="w-full lg:w-80 h-64 lg:h-full shrink-0">
-          <ChatPanel
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isGenerating={isGenerating}
-          />
-        </div>
+      {/* Title bar */}
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-800 shrink-0">
+        <button
+          onClick={() => setShowProjects((p) => !p)}
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+        >
+          <span className="material-symbols-outlined text-sm">folder_open</span>
+          Projects
+        </button>
+        <span className="text-slate-700">|</span>
+        <span className="text-sm font-display text-slate-200">{currentTitle}</span>
+      </div>
 
-        {/* Code Editor */}
-        <div className="flex-1 h-64 lg:h-full min-w-0">
-          <CodeEditor
-            files={files}
-            selectedPath={selectedPath}
-            onSelectFile={setSelectedPath}
-            onUpdateFile={handleUpdateFile}
-          />
-        </div>
+      <div className="flex-1 flex overflow-hidden">
+        {/* Projects Panel (collapsible) */}
+        {showProjects && (
+          <div className="w-64 shrink-0 border-r border-slate-800 overflow-y-auto">
+            <ProjectsPanel
+              onLoadProject={handleLoadProject}
+              currentFiles={files}
+              currentTitle={currentTitle}
+            />
+          </div>
+        )}
 
-        {/* Preview Panel */}
-        <div className="w-full lg:w-96 h-64 lg:h-full shrink-0">
-          <PreviewPanel
-            files={files}
-            isBuilding={buildStatus.phase === "building"}
-          />
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+          {/* Chat Panel */}
+          <div className="w-full lg:w-80 h-64 lg:h-full shrink-0">
+            <ChatPanel
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isGenerating={isGenerating}
+            />
+          </div>
+
+          {/* Code Editor */}
+          <div className="flex-1 h-64 lg:h-full min-w-0">
+            <CodeEditor
+              files={files}
+              selectedPath={selectedPath}
+              onSelectFile={setSelectedPath}
+              onUpdateFile={handleUpdateFile}
+            />
+          </div>
+
+          {/* Preview Panel */}
+          <div className="w-full lg:w-96 h-64 lg:h-full shrink-0">
+            <PreviewPanel
+              files={files}
+              isBuilding={buildStatus.phase === "building"}
+            />
+          </div>
         </div>
       </div>
 

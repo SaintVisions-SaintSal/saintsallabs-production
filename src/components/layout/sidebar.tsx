@@ -14,7 +14,10 @@ const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
   { label: "Builder", href: "/builder", icon: "code" },
   { label: "Intelligence", href: "/intelligence", icon: "psychology" },
-  { label: "Deploy", href: "/deploy", icon: "rocket_launch" },
+  { label: "Real Estate", href: "/real-estate", icon: "home_work" },
+  { label: "CookinCards", href: "/cookin-cards", icon: "style" },
+  { label: "Deploy", href: "/deploy", icon: "deployed_code" },
+  { label: "Launch", href: "/launch", icon: "checklist" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 

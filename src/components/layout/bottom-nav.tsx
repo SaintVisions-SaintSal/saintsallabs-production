@@ -11,10 +11,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
+  { label: "Home", href: "/dashboard", icon: "dashboard" },
   { label: "Builder", href: "/builder", icon: "code" },
-  { label: "Intelligence", href: "/intelligence", icon: "psychology" },
-  { label: "Account", href: "/settings", icon: "person" },
+  { label: "SAL", href: "/intelligence", icon: "psychology" },
+  { label: "Real Est.", href: "/real-estate", icon: "home_work" },
+  { label: "Cards", href: "/cookin-cards", icon: "style" },
 ];
 
 export function BottomNav() {
